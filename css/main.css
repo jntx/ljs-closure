@@ -1,0 +1,47 @@
+:root {
+	font-size: 10pt;
+}
+
+* {
+	font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+	box-sizing: border-box;
+}
+
+h1 {
+	font-size: 120%;
+}
+
+.slides {
+	scroll-snap-type: mandatory;
+    scroll-snap-points-y: repeat(100vh);
+    scroll-snap-type: y mandatory;
+}
+
+.slide {
+	scroll-snap-align: start;
+	border: #ccc solid 1px;
+	border-radius: 0.5rem;
+	padding : 1rem;
+	height: 100vh;
+	width: 100vw;
+	position: relative;
+}
+
+pre {
+	border-radius: 0.5rem;
+	background-color: #eee;
+	padding: 1rem;
+	font-family: 'Courier New', Courier, monospace;
+}
+
+code {
+	color: rgb(25, 25, 114);
+	background-color: #cfcfed;
+	font-family: 'Courier New', Courier, monospace;
+	padding: 0 0.3rem;
+	border-radius: 0.3rem
+}
+
+td {
+	vertical-align: top;
+}

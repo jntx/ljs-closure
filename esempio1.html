@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Document</title>
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+	<script src="js/esempio1.js"></script>
+</head>
+<body>
+	<div class="slides">
+		<div class="slide">
+			<h1>Caratteristiche</h1>
+			<ul>
+				<li>Una closure è uno blocco di codice con stato privato.</li>
+				<li>L'interno di una closure è visibile solo ai suoi membri interni e non è accessibile dall'esterno.</li>
+				<li>&Egrave; buona prassi dichiarare le variabili della closure utilizzando <code>let</code> (<code>var</code> andrebbe usato solo quando si sa esattamente cosa si vuole ottenere).</li>
+			</ul>
+			<h1>Vantaggi</h1>
+			<ul>
+				<li>Permette di non "sporcare" l'ambiente con le proprie funzioni e variabili.</li>
+				<li>Può emulare facilmente una classe senza dover manipolare i prototipi.</li>
+				<li>Utilizzata per creare istanze, implementa il design pattern della factory.</li>
+			</ul>
+			<h1>Svantaggi</h1>
+			<ul>
+				<li>Poichè privata non è possibile sondarla dalla console del browser e quindi il debugging al suo interno è complesso: occorre provvedere un meccanismo che la espone o utilizzare il debugger.</li>
+				<li>Non esiste ereditarietà.</li>
+			</ul>
+		</div>
+		<div class="slide">
+			Esempio di una closure minimale:
+			<pre>
+{
+	let a = 1;
+	console.log(a); // 1
+}
+
+console.log(a); // a is not defined
+			</pre>
+			<div>
+				Le parentesi graffe delimitano la closure. La variabile <code>a</code> (poichè dichiarata con <code>let</code>) è visibile solo all'interno della closure; richiamandola da fuori della closure non è definita.
+			</div>
+		</div>
+		<div class="slide">
+			Una closure un po' più articolata:
+			<pre>
+let API = {};
+
+{
+	let stato = 0;
+	
+	API.add = function(v) {
+		let n = +v;
+		stato += isNaN(n) ? 0 : n;
+	}
+
+	API.sub = function(v) {
+		let n = +v;
+		stato -= isNaN(n) ? 0 : n;
+	}
+
+	API.print = function() {
+		console.log("Valore attuale: " + stato);
+	}
+}
+
+API.add(15);
+API.sub(3);
+API.print(); // Valore attuale: 12
+			</pre>
+			<div>
+				La closure "vede" il suo scope esterno, quindi ha accesso alla variabile <code>API</code>. Anche le funzioni definite all'interno sono a loro volta delle closure e, come quella principale, possono accedere agli scope superiori (a meno che non vengano mascherate delle variabili tramite omonimia).
+			</div>
+		</div>
+		<div class="slide">
+			Rielaborazione:
+			<pre>
+let getAPI = function(initialState)	{
+	let stato = initialState || 0;
+	
+	let add = function(v) {
+		let n = +v;
+		stato += isNaN(n) ? 0 : n;
+	};
+
+	let sub = function(v) {
+		let n = +v;
+		stato -= isNaN(n) ? 0 : n;
+	};
+
+	let print = function() {
+		console.log("Valore attuale: " + stato);
+	};
+
+	return {
+		add : add,
+		sub : sub,
+		print : print
+	};
+}
+
+let closure1 = getAPI();
+let closure2 = getAPI(100);
+
+closure1.add(15);
+closure2.sub(15);
+closure1.print(); // Valore attuale: 15
+closure2.print(); // Valore attuale: 85
+			</pre>
+			<div>
+				<code>getAPI()</code> ritorna una API ad una closure privata. Ogni chiamata "istanzia" una nuova closure come fosse una factory. <code>closure1</code> e <code>closure2</code> poggiano quindi su due closure differenti.
+			</div>
+		</div>
+		<div class="slide">
+			<h1>Le closure non sono costruttori di istanze (anche se lo sembrano).</h1>
+			<table>
+			<tr>
+				<th>Closure</th>
+				<th>Costruttore</th>
+			</tr>
+			<tr>
+				<td>
+					<pre>
+let getAPI = function(initialState)	{
+	let stato = initialState || 0;
+	
+	let add = function(v) {
+		let n = +v;
+		stato += isNaN(n) ? 0 : n;
+	};
+
+	let sub = function(v) {
+		let n = +v;
+		stato -= isNaN(n) ? 0 : n;
+	};
+
+	let print = function() {
+		console.log("Valore attuale: " + stato);
+	};
+
+	return {
+		add : add,
+		sub : sub,
+		print : print
+	};
+}
+
+let closure = getAPI();
+					</pre>
+				</td>
+				<td>
+					<pre>
+let myAPI = function(initialState)	{
+	let stato = initialState || 0;
+	
+	this.add = function(v) {
+		let n = +v;
+		stato += isNaN(n) ? 0 : n;
+	};
+
+	this.sub = function(v) {
+		let n = +v;
+		stato -= isNaN(n) ? 0 : n;
+	};
+
+	this.print = function() {
+		console.log("Valore attuale: " + stato);
+	};
+}
+
+let istanza = new myAPI();
+					</pre>
+				</td>
+			</tr>
+			</table>
+			<div>
+				In un costruttore esiste <code>this</code> ovvero un riferimento all'istanza alla quale vengono iniettati i metodi. Nella closure ritorniamo un oggetto anonimo. All'interno della closure i riferimenti a <code>this</code> vengono intercettati dal primo oggetto che definisce il contesto della chiamata (in questo caso sarebbe <code>window</code>, ma se la chiamata avviene all'interno del metodo di un oggetto allora farebbe riferimento all'istanza).<br>
+				ATTENZIONE: per ottenere lo stato privato nel costruttore è stata sfruttata la closure della funzione costruttore. Se si fosse scritto <code>this.stato = initialState || 0;</code> lo stato sarebbe stato pubblico poichè diveniva una proprietà dell'istanza.
+			</div>
+		</div>
+		<div class="slide">
+			<h1>I file .js esterni sono closure</h1>
+			<h2>mylib.js</h2>
+			<pre>
+				let 
+			</pre>
+			<div>
+				In un costruttore esiste <code>this</code> ovvero un riferimento all'istanza alla quale vengono iniettati i metodi. Nella closure ritorniamo un oggetto anonimo. All'interno della closure i riferimenti a <code>this</code> vengono intercettati dal primo oggetto che definisce il contesto della chiamata (in questo caso sarebbe <code>window</code>, ma se la chiamata avviene all'interno del metodo di un oggetto allora farebbe riferimento all'istanza).<br>
+				ATTENZIONE: per ottenere lo stato privato nel costruttore è stata sfruttata la closure della funzione costruttore. Se si fosse scritto <code>this.stato = initialState || 0;</code> lo stato sarebbe stato pubblico poichè diveniva una proprietà dell'istanza.
+			</div>
+		</div>
+
+	</div>
+</body>
+</html>

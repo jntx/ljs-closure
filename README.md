@@ -1,2 +1,2 @@
 # ljs-closure
-Le clojure in Javascript
+Le closure in Javascript
