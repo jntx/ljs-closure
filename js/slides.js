@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", e => {
-	window.slideController = slideController(document.querySelector(".slides"), ".slide");
+	slideController(document.querySelector(".slides"), ".slide");
 });
 
 function slideController(container, slideSelector) {
