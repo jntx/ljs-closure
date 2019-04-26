@@ -43,6 +43,7 @@ function slideController(container, slideSelector) {
 			controls.prev.classList.remove("enabled");
 		} else {
 			controls.prev.classList.add("enabled");
+			controls.prev.classList.remove("disabled");
 		}
 
 		if (n == slides.length - 1) {
@@ -50,6 +51,7 @@ function slideController(container, slideSelector) {
 			controls.next.classList.remove("enabled");
 		} else {
 			controls.next.classList.add("enabled");
+			controls.next.classList.remove("disabled");
 		}
 
 		slides[n].classList.remove("hide");
