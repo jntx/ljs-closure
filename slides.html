@@ -183,17 +183,92 @@ let istanza = new myAPI();
 			</div>
 		</div>
 		<div class="slide">
-			<h1>I file .js esterni sono closure</h1>
-			<h2>mylib.js</h2>
+			<h1>Una closure particolare: il Module Pattern</h1>
+			<h2>Il Module Pattern è uno speciale tipo di closure incapsulata in una IIFE (= Immediately-Invoked Function Expression)</h2>
 			<pre>
-				let 
+let moduloAPI = (function(initialState)	{
+	let stato = initialState || 0;
+	
+	let add = function(v) {
+		let n = +v;
+		stato += isNaN(n) ? 0 : n;
+	};
+
+	let sub = function(v) {
+		let n = +v;
+		stato -= isNaN(n) ? 0 : n;
+	};
+
+	let print = function() {
+		console.log("Valore attuale: " + stato);
+	};
+
+	return {
+		add : add,
+		sub : sub,
+		print : print
+	};
+})(7);
+
+moduloAPI.add(15);
+moduloAPI.print(); // Valore attuale: 22
 			</pre>
 			<div>
-				In un costruttore esiste <code>this</code> ovvero un riferimento all'istanza alla quale vengono iniettati i metodi. Nella closure ritorniamo un oggetto anonimo. All'interno della closure i riferimenti a <code>this</code> vengono intercettati dal primo oggetto che definisce il contesto della chiamata (in questo caso sarebbe <code>window</code>, ma se la chiamata avviene all'interno del metodo di un oggetto allora farebbe riferimento all'istanza).<br>
-				ATTENZIONE: per ottenere lo stato privato nel costruttore è stata sfruttata la closure della funzione costruttore. Se si fosse scritto <code>this.stato = initialState || 0;</code> lo stato sarebbe stato pubblico poichè diveniva una proprietà dell'istanza.
+				Questo sistema permette di "sporcare" ancora meno l'ambiente JavaScript poichè la funzione viene costruita in modo anonimo ed invocata. La closure - e anche il codice della funzione - sono inaccessibili dall'esterno (non è possibile sfruttare nemmeno la <code>.toSource()</code>).<br>
+				Il Module Pattern è di fatto l'implementazione del design pattern del Singleton.
+			</div>
+		</div>
+		<div class="slide">
+			<h1>Module Pattern: le dipendenze</h1>
+			<h2>Tramite le closure e il Module Pattern si implementano le catene di dipendenze.</h2>
+			<pre>
+let moduloMessaggi = (function(){
+	return {
+		console : function(txt) { console.log("[MODULO MESSAGGI] " + txt); },
+		video : function(txt) { alert(txt); }
+	}
+})();
+
+let moduloAPI = (function(messaggi, initialState) {
+	let stato = initialState || 0;
+	
+	let add = function(v) {
+		let n = +v;
+		stato += isNaN(n) ? 0 : n;
+	};
+
+	let sub = function(v) {
+		let n = +v;
+		stato -= isNaN(n) ? 0 : n;
+	};
+
+	let print = function() {
+		messaggi.console("Valore attuale: " + stato);
+	};
+
+	return {
+		add : add,
+		sub : sub,
+		print : print
+	};
+})(moduloMessaggi, 7);
+
+moduloAPI.add(15);
+moduloAPI.print(); // [MODULO MESSAGGI] Valore attuale: 22
+			</pre>
+			<div>
+				Passando <code>moduloMessaggi</code> come parametro al mio <code>moduloAPI</code> definisco la dipendenza fra i due moduli (<code>moduloAPI</code> dipende da <code>moduloMessaggi</code>).<br>I software che creano i bundle JS non fanno altro che analizzare le dipendenze fra i moduli per poi generare il codice (che è a sua volta un IIFE con closure privata... quindi un Module Pattern) che mette in dipendenza i moduli fra loro in maniera simile a questa.
 			</div>
 		</div>
 
+		<div class="slide last-slide">
+			<h1>Queste slides:</h1>
+			<h2>https://github.com/jntx/ljs-closure</h2>
+			<div>
+				<br><br>
+				Nota: il navigatore delle slides in basso a destra è gestito da una closure! ;)
+			</div>
+		</div>
 	</div>
 </body>
 </html>
