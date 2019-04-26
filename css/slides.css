@@ -1,0 +1,41 @@
+.sc--controls {
+	display: grid;
+	position: fixed;
+	bottom: 0.3rem;
+	right: 0.3rem;
+	grid-template-columns: 1fr 2fr 1fr;
+	background-color: #ddd;
+	padding: 0.3rem;
+	border-radius: 0.3rem;
+}
+
+.sc--control {
+	text-align: center;
+	padding: 0.3rem 1rem;
+	border-radius: 0.3rem;
+}
+
+.sc--prev, .sc--next {
+	font-weight: bold;
+}
+
+.hide {
+	display: none;
+}
+
+.show {
+	display: inherit;
+}
+
+.enabled {
+	color: #000;
+	cursor: pointer;
+}
+
+.enabled:hover {
+	background-color: #eee;
+}
+
+.disabled {
+	color: #888;
+}

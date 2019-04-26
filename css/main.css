@@ -7,24 +7,23 @@
 	box-sizing: border-box;
 }
 
+body {
+	margin: 0;
+	padding: 0;
+}
+
 h1 {
 	font-size: 120%;
 }
 
 .slides {
-	scroll-snap-type: mandatory;
-    scroll-snap-points-y: repeat(100vh);
-    scroll-snap-type: y mandatory;
+	padding: 1rem;
 }
 
 .slide {
-	scroll-snap-align: start;
 	border: #ccc solid 1px;
 	border-radius: 0.5rem;
 	padding : 1rem;
-	height: 100vh;
-	width: 100vw;
-	position: relative;
 }
 
 pre {
