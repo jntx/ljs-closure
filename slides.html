@@ -7,7 +7,6 @@
 	<title>Closure in JavaScript</title>
 	<link rel="stylesheet" type="text/css" href="css/main.css">
 	<link rel="stylesheet" type="text/css" href="css/slides.css">
-	<script src="js/esempio1.js"></script>
 	<script src="js/slides.js"></script>
 </head>
 <body>
@@ -258,6 +257,71 @@ moduloAPI.print(); // [MODULO MESSAGGI] Valore attuale: 22
 			</pre>
 			<div>
 				Passando <code>moduloMessaggi</code> come parametro al mio <code>moduloAPI</code> definisco la dipendenza fra i due moduli (<code>moduloAPI</code> dipende da <code>moduloMessaggi</code>).<br>I software che creano i bundle JS non fanno altro che analizzare le dipendenze fra i moduli per poi generare il codice (che è a sua volta un IIFE con closure privata... quindi un Module Pattern) che mette in dipendenza i moduli fra loro in maniera simile a questa.
+			</div>
+		</div>
+		<div class="slide">
+			<h1>I moduli JS</h1>
+			<h2>I moduli JavaScript (script con <code>type="module"</code>) sono delle closure che esportano quel che contengono tramite l'istruzione <code>export</code>.</h2>
+			<h3>messaggi.mjs</h3>
+			<pre>
+function console(txt) { console.log("[MODULO MESSAGGI] " + txt); };
+function video(txt) { alert(txt); };
+
+export { console, video };
+			</pre>
+			<h3>api.mjs</h3>
+			<pre>
+import * as messaggi from "./messaggi.mjs";
+
+let stato = window.initialState || 0;
+	
+let add = function(v) {
+	let n = +v;
+	stato += isNaN(n) ? 0 : n;
+};
+
+let sub = function(v) {
+	let n = +v;
+	stato -= isNaN(n) ? 0 : n;
+};
+
+let print = function() {
+	messaggi.console("Valore attuale: " + stato);
+};
+
+let API = {
+	add : add,
+	sub : sub,
+	print : print
+};
+
+window.moduloAPI = API;
+
+export { API };
+			</pre>
+			<h3>page.html</h3>
+			<pre>
+&lt;html&gt;
+	&lt;script type="module" src="api.mjs" onload="test();"&gt;&lt;/script&gt;
+	&lt;script&gt;
+		let initialState = 5;
+
+		function test() {
+			moduloAPI.add(7);
+			moduloAPI.print(); // [MODULO MESSAGGI] Valore attuale: 12
+		}
+	&lt;/script&gt;
+&lt;body&gt;
+	[...]
+&lt;/body&gt;	
+&lt;/html&gt;
+			</pre>
+			<div>
+				Il modulo <code>messaggi.mjs</code> esporta le funzioni <code>console</code> e <code>video</code>. Il fatto stesso di essere un file a parte rende questo modulo una closure a se stante senza bisogno di parentesi graffe a delimitarla.<br>
+				Il modulo <code>api.mjs</code> importa tutto quanto viene esportato dal modulo <code>messaggi.mjs</code> iniettandolo in un oggetto anonimo <code>messaggi</code>. Non è obbligatorio importare tutto, si può importare anche solo quel che si usa (lo scopo è sempre tenere l'ambiente pulito senza riempirlo di simboli). Non c'è più necessità di una funzione per contenere la logica che prima era nella closure.<br>
+				L'unico modo per accedere ai simboli dell'oggetto globale (<code>window</code>) è chiamarli esplicitamente. Recuperare <code>initialState</code> in questo caso è una forzatura per emulare un comportamento analogo agli esempi precedenti.<br>
+				Per esporre la API nella pagina HTML l'unica possibilità attualmente è quella di iniettarla direttamente nell'oggetto globale.<br>
+				Nella pagina HTML viene testato il funzionamento della API allo scattare dell'evento <code>load</code> dello script: ciò è necessario poichè il caricamento dei moduli avviene in modalità <code>defer</code> ovvero in coda a tutto ciò che è caricato sincrono (quindi anche dopo l'esecuzione dell'evento <code>DOMContentLoaded</code>).
 			</div>
 		</div>
 
