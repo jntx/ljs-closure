@@ -96,13 +96,8 @@ function slideController(container, slideSelector) {
 
 		host.appendChild(d);
 
-		// 
-
 		setActiveSlide(0);
-		// slides.forEach(slide => {
-		// 	slide.classList.add("hide");
-		// 	slide.classList.remove("show");
-		// });
+
 		setupKeyBindings();
 	};
 
