@@ -3,8 +3,9 @@ document.addEventListener("DOMContentLoaded", e => {
 });
 
 function slideController(container, slideSelector) {
+	let doc = document;
 	let host = container;
-	let slides = document.querySelectorAll(slideSelector) || [];
+	let slides = container.querySelectorAll(slideSelector) || [];
 	let position = 0;
 	let controls = {
 		prev : null,
@@ -60,6 +61,21 @@ function slideController(container, slideSelector) {
 		controls.count.innerHTML = `${n + 1} / ${slides.length}`;
 	}
 
+	let setupKeyBindings = function() {
+		doc.addEventListener("keyup", e => {
+			switch(e.key) {
+				case "ArrowRight":
+					slideNext(e);
+					break;
+				case "ArrowLeft":
+					slidePrev(e);
+					break;
+			}
+
+			return true;
+		}, true);
+	}
+
 	let setup = () => {
 		let html = `
 			<div class="sc--control sc--prev">&lt;</div>
@@ -67,7 +83,7 @@ function slideController(container, slideSelector) {
 			<div class="sc--control sc--next">&gt;</div>
 		`;
 
-		let d = document.createElement("div");
+		let d = doc.createElement("div");
 		d.classList.add("sc--controls");
 		d.innerHTML = html;
 		
@@ -87,6 +103,7 @@ function slideController(container, slideSelector) {
 		// 	slide.classList.add("hide");
 		// 	slide.classList.remove("show");
 		// });
+		setupKeyBindings();
 	};
 
 	setup();
