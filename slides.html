@@ -324,6 +324,80 @@ export { API };
 				Nella pagina HTML viene testato il funzionamento della API allo scattare dell'evento <code>load</code> dello script: ciò è necessario poichè il caricamento dei moduli avviene in modalità <code>defer</code> ovvero in coda a tutto ciò che è caricato sincrono (quindi anche dopo l'esecuzione dell'evento <code>DOMContentLoaded</code>).
 			</div>
 		</div>
+		<div class="slide">
+				<h1>Closure... non solo in JavaScript</h1>
+				<h2>Anche in PHP (dalla versione 5.3) sono state rese disponibili delle strutture che agiscono in modo simile alle closure JavaScript.</h2>
+				<pre>
+&lt;?php
+	$getAPI = function($initialState = 0) {
+		$stato = is_numeric($initialState) ? $initialState : 0;
+		
+		$add = function($v) use (&$stato) {
+			$stato += is_numeric($v) ? $v : 0;
+		};
+		
+		$sub = function($v) use (&$stato) {
+			$stato -= is_numeric($v) ? $v : 0;
+		};
+		
+		$print = function() use (&$stato) {
+			echo "Valore attuale: ".$stato."\n";
+		};
+		
+		return array(
+			"add" => $add,
+			"sub" => $sub,
+			"print" => $print
+		);
+	};
+	
+	$closure1 = $getAPI();
+	$closure2 = $getAPI(100);
+	
+	$closure1["add"](15);
+	$closure2["sub"](15);
+	$closure1["print"](); // Valore attuale: 15
+	$closure2["print"](); // Valore attuale: 85
+			</pre>
+			<div>
+				Differenze principali con le closure JavaScript:
+				<ul>
+					<li>Le closure in PHP sono sostanzialmente funzioni anonime</li>
+					<li>Lo scope visibile è unicamente quello reso disponibile dalla clausola <code>use</code></li>
+				</ul>
+				&Egrave; possibile ritornare un oggetto con iniettati i metodi desiderati. Per farlo occorre appoggiarsi ad una classe appositamente configurata. Esempio:
+			<pre>
+class classeManipolabile {
+	public function __call($methodName, $args) {
+		if (isset($this->$methodName)) {
+			$callableFunction = $this->$methodName;
+
+			return call_user_func_array($callableFunction, $args);
+		}
+	}
+}
+
+[...]
+
+// Si sostituisce la return con questo codice:
+	$obj = new classeManipolabile();
+	$obj->add = $add;
+	$obj->sub = $sub;
+	$obj->print = $print;
+
+	return $obj;
+
+// Il corpo del programma diventerà così:
+$closure1 = $getAPI();
+$closure2 = $getAPI(100);
+
+$closure1->add(15);
+$closure2->sub(15);
+$closure1->print(); // Valore attuale: 15
+$closure2->print(); // Valore attuale: 85
+			</pre>
+			</div>
+		</div>
 
 		<div class="slide last-slide">
 			<h1>Queste slides:</h1>
