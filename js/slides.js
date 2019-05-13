@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", e => {
 function slideController(container, slideSelector) {
 	let doc = document;
 	let host = container;
+	let hostContainer = doc.querySelector("html") || {};
 	let slides = container.querySelectorAll(slideSelector) || [];
 	let position = 0;
 	let controls = {
@@ -57,6 +58,7 @@ function slideController(container, slideSelector) {
 
 		slides[n].classList.remove("hide");
 		slides[n].classList.add("show");
+		hostContainer.scrollTop = 0;
 
 		controls.count.innerHTML = `${n + 1} / ${slides.length}`;
 	}
